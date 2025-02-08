@@ -20,15 +20,13 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/BlitzGame" element={<BlitzGame />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
-      </Container>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/BlitzGame" element={<BlitzGame />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
     </ThemeProvider>
   );
 };
