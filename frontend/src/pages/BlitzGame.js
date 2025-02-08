@@ -82,7 +82,7 @@ const BlitzGame = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        width: "100%",
+        width: "99%",
         position: "relative",
         paddingTop: "20px",
       }}
