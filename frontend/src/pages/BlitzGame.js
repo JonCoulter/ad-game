@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import BlitzLogo from "../assets/blitz-logo-removebg-preview.png";
 
 const BlitzGame = () => {
   const [score, setScore] = useState(0);
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(5);
   const [isGameOver, setIsGameOver] = useState(false);
   const [currentVideo, setCurrentVideo] = useState(null);
   const [swipeDirection, setSwipeDirection] = useState(null);
@@ -25,12 +25,10 @@ const BlitzGame = () => {
     }
   };
 
-  // Fetch the first video on component mount
   useEffect(() => {
     fetchRandomVideo();
   }, []);
 
-  // Timer logic
   useEffect(() => {
     if (timer > 0) {
       const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
@@ -40,7 +38,6 @@ const BlitzGame = () => {
     }
   }, [timer]);
 
-  // Handle swipe logic
   const handleSwipe = useCallback(
     (direction) => {
       if (isGameOver || !currentVideo) return;
@@ -53,14 +50,13 @@ const BlitzGame = () => {
 
       setTimeout(() => {
         setScore((prev) => prev + (isCorrect ? 1 : -1));
-        fetchRandomVideo(); // Fetch a new video after swiping
+        fetchRandomVideo();
         setSwipeDirection(null);
       }, 300);
     },
     [currentVideo, isGameOver]
   );
 
-  // Handle key presses for left/right
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key === "ArrowRight") {
@@ -73,6 +69,13 @@ const BlitzGame = () => {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleSwipe]);
+
+  const restartGame = () => {
+    setScore(0);
+    setTimer(60);
+    setIsGameOver(false);
+    fetchRandomVideo();
+  };
 
   return (
     <Box
@@ -87,13 +90,14 @@ const BlitzGame = () => {
         paddingTop: "20px",
       }}
     >
-      {/* Logo - Stays at the Top */}
+      {/* Logo */}
       <Box
         sx={{
           position: "absolute",
           top: "20px",
           left: "50%",
           transform: "translateX(-50%)",
+          zIndex: 2,
         }}
       >
         <img
@@ -103,111 +107,153 @@ const BlitzGame = () => {
         />
       </Box>
 
-      {/* Timer & Score */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "500px",
-          marginTop: "100px",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{ fontSize: "24px", fontWeight: "bold", color: "#007FFF" }}
+      {/* Game Over Screen */}
+      {isGameOver ? (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(0,0,0,0.8)",
+            padding: "20px",
+            borderRadius: "16px",
+            textAlign: "center",
+            zIndex: 5,
+          }}
         >
-          {String(Math.floor(timer / 60)).padStart(2, "0")}:
-          {String(timer % 60).padStart(2, "0")}
-        </Typography>
-        <Typography
-          variant="h4"
-          sx={{ fontSize: "24px", fontWeight: "bold", color: "#FF5722" }}
-        >
-          {score}
-        </Typography>
-      </Box>
-
-      {/* Video Box */}
-      <Box
-        sx={{
-          position: "relative",
-          width: "100%",
-          maxWidth: "500px",
-          aspectRatio: "9 / 16",
-          borderRadius: "16px",
-          overflow: "hidden",
-        }}
-      >
-        <AnimatePresence>
-          {currentVideo && (
-            <motion.div
-              key={currentVideo.url}
-              initial={{ x: 0, opacity: 1 }}
-              animate={{
-                x:
-                  swipeDirection === "left"
-                    ? -400
-                    : swipeDirection === "right"
-                    ? 400
-                    : 0,
-                opacity: swipeDirection ? 0 : 1,
-              }}
-              transition={{ duration: 0.3 }}
-              style={{
-                width: "100%",
-                height: "100%",
-                position: "relative",
-                zIndex: 1,
-              }}
+          <Typography variant="h4" sx={{ color: "white", fontWeight: "bold" }}>
+            Game Over
+          </Typography>
+          <Typography variant="h5" sx={{ color: "#FFD700", marginTop: "10px" }}>
+            Your Score: {score}
+          </Typography>
+          <Button
+            variant="contained"
+            sx={{
+              marginTop: "15px",
+              backgroundColor: "#007FFF",
+              color: "white",
+              "&:hover": { backgroundColor: "#005FCC" },
+            }}
+            onClick={restartGame}
+          >
+            Play Again
+          </Button>
+        </Box>
+      ) : (
+        <>
+          {/* Timer & Score */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              maxWidth: "500px",
+              marginTop: "100px",
+              zIndex: 2,
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{ fontSize: "24px", fontWeight: "bold", color: "#007FFF" }}
             >
-              <video
-                src={currentVideo.url}
-                controls
-                autoPlay
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "16px",
-                }}
-                onError={(e) => {
-                  console.error("Error loading video:", e.target.src);
-                  fetchRandomVideo(); // Fetch another video if current one fails
-                }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Box>
+              {String(Math.floor(timer / 60)).padStart(2, "0")}:
+              {String(timer % 60).padStart(2, "0")}
+            </Typography>
+            <Typography
+              variant="h4"
+              sx={{ fontSize: "24px", fontWeight: "bold", color: "#FF5722" }}
+            >
+              {score}
+            </Typography>
+          </Box>
 
-      {/* AD & REAL Labels */}
-      <Typography
-        variant="h4"
-        sx={{
-          position: "absolute",
-          left: "35px",
-          color: "red",
-          fontWeight: "bold",
-          padding: "8px 16px",
-          borderRadius: "12px",
-        }}
-      >
-        ⬅️ AD
-      </Typography>
-      <Typography
-        variant="h4"
-        sx={{
-          position: "absolute",
-          right: "-10px",
-          color: "green",
-          fontWeight: "bold",
-          padding: "8px 16px",
-          borderRadius: "12px",
-        }}
-      >
-        REAL ➡️
-      </Typography>
+          {/* Video Box */}
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "500px",
+              aspectRatio: "9 / 16",
+              borderRadius: "16px",
+              overflow: "hidden",
+              zIndex: 2,
+            }}
+          >
+            <AnimatePresence>
+              {currentVideo && (
+                <motion.div
+                  key={currentVideo.url}
+                  initial={{ x: 0, opacity: 1 }}
+                  animate={{
+                    x:
+                      swipeDirection === "left"
+                        ? -400
+                        : swipeDirection === "right"
+                        ? 400
+                        : 0,
+                    opacity: swipeDirection ? 0 : 1,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    position: "relative",
+                    zIndex: 3,
+                  }}
+                >
+                  <video
+                    src={currentVideo.url}
+                    controls
+                    autoPlay
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: "16px",
+                    }}
+                    onError={(e) => {
+                      console.error("Error loading video:", e.target.src);
+                      fetchRandomVideo();
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Box>
+
+          {/* AD & REAL Labels */}
+          <Typography
+            variant="h4"
+            sx={{
+              position: "absolute",
+              left: "35px",
+              color: "red",
+              fontWeight: "bold",
+              padding: "8px 16px",
+              borderRadius: "12px",
+              zIndex: 2,
+            }}
+          >
+            ⬅️ ad
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              position: "absolute",
+              right: "35px",
+              color: "green",
+              fontWeight: "bold",
+              padding: "8px 16px",
+              borderRadius: "12px",
+              zIndex: 2,
+            }}
+          >
+            real ➡️
+          </Typography>
+        </>
+      )}
     </Box>
   );
 };
