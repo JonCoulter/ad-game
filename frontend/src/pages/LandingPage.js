@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Container } from "@mui/material";
+import logo from "../assets/MainLogo.png"; // ✅ Correct import path
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -9,32 +10,36 @@ const LandingPage = () => {
     <Container maxWidth="sm" sx={{ textAlign: "center", mt: 8 }}>
       {}
       <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "80px",
-          height: "80px",
-          backgroundColor: "#d3d6da", // Placeholder background color
-          borderRadius: "8px",
-          mx: "auto",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-          🔲
-        </Typography>
-      </Box>
+  component="img"
+  src= {logo}
+  alt="AdVera Logo"
+  sx={{
+    width: "100px",  // Adjust size as needed
+    height: "100px",
+    mx: "auto",
+    mb: 2,
+  }}
+/>
 
       {/* Title */}
       <Typography variant="h3" fontWeight="bold">
-        Ad Detector
+        AdVera
       </Typography>
 
       {/* Subtitle */}
-      <Typography variant="subtitle1" sx={{ mt: 1, mb: 4 }}>
-        Not everything is what it seems... can you spot the ads?
-      </Typography>
+      <Typography 
+  variant="subtitle1" 
+  sx={{ 
+    mt: 1, 
+    mb: 4, 
+    fontSize: "1.2rem", // Change font size
+    fontWeight: "bold", // Change font weight
+    fontFamily: "'League Spartan', sans-serif", // Use a custom font
+    color: "#333" 
+  }}
+>
+  Not everything is what it seems... can you spot the ads?
+</Typography>
 
       {/* Buttons */}
       <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
