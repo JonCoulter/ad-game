@@ -14,7 +14,7 @@ import {
   Divider,
   IconButton,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add"; 
+import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete"; // Importing Add icon
 
 import ButtonCustom from "../components/Button";
@@ -179,18 +179,18 @@ const Dashboard = () => {
           ad_id: adId, // Pass the ad_id to be deleted
         }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete ad");
       }
-  
+
       // Remove the ad from the selected project ads list in the state
       setSelectedProject((prevProject) => ({
         ...prevProject,
         ads: prevProject.ads.filter((ad) => ad.ad_id !== adId),
       }));
-  
+
       // Optionally, you can remove the ad from the main projects list as well
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
@@ -222,6 +222,22 @@ const Dashboard = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
       <Grid container spacing={2} alignItems="center">
+        {/* Home Button */}
+        <Grid item xs={10}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              marginBottom: 2, // Add space below the button
+              fontWeight: 600,
+              textTransform: "none",
+            }}
+            onClick={() => navigate("/")} // Navigate to the home route
+          >
+            Home
+          </Button>
+        </Grid>
+
         {/* Grid Item for Welcome Text */}
         <Grid item xs={10}>
           <Typography variant="h4" sx={{ fontSize: "2rem" }} gutterBottom>
@@ -358,135 +374,135 @@ const Dashboard = () => {
       </Modal>
 
       {/* Project Details Modal */}
-{/* Project Details Modal */}
-<Modal
-  open={openProjectModal}
-  onClose={() => setOpenProjectModal(false)} // This will still allow closing by clicking outside
-  aria-labelledby="project-details-modal"
-  aria-describedby="project-details-modal-description"
->
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      minHeight: "100vh", // Ensure it takes full height to enable background clicks
-      backdropFilter: "blur(4px)", // Keeps the blur effect for background
-    }}
-  >
-    <Card
-      sx={{
-        p: 3,
-        backgroundColor: "#fff",
-        borderRadius: 3,
-        maxWidth: 600,
-        width: "100%",
-        boxShadow: 24,
-        position: "relative", // To position the close button
-      }}
-    >
-      {/* Close Button in the top-right corner */}
-      <IconButton
-        onClick={() => setOpenProjectModal(false)} // Close the modal when clicked
-        sx={{
-          position: "absolute",
-          top: 10,
-          right: 10,
-          color: "text.secondary",
-        }}
+      {/* Project Details Modal */}
+      <Modal
+        open={openProjectModal}
+        onClose={() => setOpenProjectModal(false)} // This will still allow closing by clicking outside
+        aria-labelledby="project-details-modal"
+        aria-describedby="project-details-modal-description"
       >
-        <CloseIcon />
-      </IconButton>
-
-      <Typography
-        variant="h4"
-        sx={{ fontWeight: 600, color: "primary.main" }}
-        gutterBottom
-      >
-        {selectedProject?.project_name}
-      </Typography>
-
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-          Ads
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-
-        {/* Display Ads and Analytics */}
-        {selectedProject?.ads?.length > 0 ? (
-          selectedProject.ads.map((ad, index) => (
-            <Card
-              key={index}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh", // Ensure it takes full height to enable background clicks
+            backdropFilter: "blur(4px)", // Keeps the blur effect for background
+          }}
+        >
+          <Card
+            sx={{
+              p: 3,
+              backgroundColor: "#fff",
+              borderRadius: 3,
+              maxWidth: 600,
+              width: "100%",
+              boxShadow: 24,
+              position: "relative", // To position the close button
+            }}
+          >
+            {/* Close Button in the top-right corner */}
+            <IconButton
+              onClick={() => setOpenProjectModal(false)} // Close the modal when clicked
               sx={{
-                p: 2,
-                mb: 2,
-                backgroundColor: "background.default",
-                borderRadius: 2,
-                boxShadow: 2,
-                display: "flex", // Ensure it aligns content horizontally
-                justifyContent: "space-between", // Space between the text and the delete button
-                alignItems: "center",
+                position: "absolute",
+                top: 10,
+                right: 10,
+                color: "text.secondary",
               }}
             >
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                  {ad.ad_name}
+              <CloseIcon />
+            </IconButton>
+
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 600, color: "primary.main" }}
+              gutterBottom
+            >
+              {selectedProject?.project_name}
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                Ads
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+
+              {/* Display Ads and Analytics */}
+              {selectedProject?.ads?.length > 0 ? (
+                selectedProject.ads.map((ad, index) => (
+                  <Card
+                    key={index}
+                    sx={{
+                      p: 2,
+                      mb: 2,
+                      backgroundColor: "background.default",
+                      borderRadius: 2,
+                      boxShadow: 2,
+                      display: "flex", // Ensure it aligns content horizontally
+                      justifyContent: "space-between", // Space between the text and the delete button
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                        {ad.ad_name}
+                      </Typography>
+
+                      {/* Correct and Incorrect Guesses */}
+                      <Box sx={{ mt: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Correct Guesses: {ad.correct_guesses || 0}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Incorrect Guesses: {ad.incorrect_guesses || 0}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* Delete Icon */}
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDeleteAd(ad.ad_id)} // Pass ad_id to delete
+                      sx={{
+                        marginLeft: "auto", // Align the delete icon to the right
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Card>
+                ))
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  No ads uploaded yet for this project.
                 </Typography>
+              )}
+            </Box>
 
-                {/* Correct and Incorrect Guesses */}
-                <Box sx={{ mt: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Correct Guesses: {ad.correct_guesses || 0}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Incorrect Guesses: {ad.incorrect_guesses || 0}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Delete Icon */}
-              <IconButton
-                color="error"
-                onClick={() => handleDeleteAd(ad.ad_id)} // Pass ad_id to delete
+            {/* Upload Ad Button */}
+            <Box
+              sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
                 sx={{
-                  marginLeft: "auto", // Align the delete icon to the right
+                  padding: "10px 20px",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
                 }}
+                onClick={() => setOpenUploadAdModal(true)}
               >
-                <DeleteIcon />
-              </IconButton>
-            </Card>
-          ))
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            No ads uploaded yet for this project.
-          </Typography>
-        )}
-      </Box>
-
-      {/* Upload Ad Button */}
-      <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{
-            padding: "10px 20px",
-            borderRadius: "8px",
-            fontWeight: 600,
-            transition: "all 0.3s ease",
-            "&:hover": {
-              backgroundColor: "primary.dark",
-            },
-          }}
-          onClick={() => setOpenUploadAdModal(true)}
-        >
-          Upload Ad
-        </Button>
-      </Box>
-    </Card>
-  </Box>
-</Modal>
-
-
+                Upload Ad
+              </Button>
+            </Box>
+          </Card>
+        </Box>
+      </Modal>
 
       {/* Upload Ad Modal */}
       <Modal
