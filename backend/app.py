@@ -47,6 +47,17 @@ def upload_file_to_gcs(file, filename):
     blob.upload_from_file(file)
     return blob.public_url
 
+def delete_file_from_gcs(file_url):
+    """Deletes the ad file from Google Cloud Storage (optional)."""
+    try:
+        # Extract the filename from the URL (assuming the file URL format)
+        blob_name = file_url.split('/')[-1]
+        bucket = storage_client.bucket(BUCKET_NAME)
+        blob = bucket.blob(f"ads/{blob_name}")
+        blob.delete()
+    except Exception as e:
+        print(f"Error deleting file from GCS: {str(e)}")
+
 # -- END FUNCTIONS --
 
 
@@ -74,7 +85,6 @@ def register():
     new_user = {
         'username': username,
         'password': hashed_password,
-        'videos': [],
     }
     users_collection.add(new_user)
     
@@ -260,6 +270,7 @@ def get_user_data():
             
             if ad_ref.exists:
                 ad_data = ad_ref.to_dict()
+                ad_data['ad_id'] = ad_id
                 project_ads.append(ad_data)
         
         # add project data with ads
@@ -308,6 +319,56 @@ def update_ad_data():
     })
 
     return jsonify({'status': 'success'}), 200
+
+
+@app.route('/api/delete_ad', methods=['POST'])
+def delete_ad():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    project_id = data.get('project_id')
+    ad_id = data.get('ad_id')
+    
+    # Check if we have the required data
+    if not user_id or not project_id or not ad_id:
+        return jsonify({"error": "User ID, Project ID, and Ad ID are required"}), 400
+
+    try:
+        # 1. Delete the ad from the ads collection
+        ad_ref = ads_collection.document(ad_id)
+        ad_doc = ad_ref.get()
+        
+        if not ad_doc.exists:
+            return jsonify({"error": "Ad not found"}), 404
+        
+        # Get the ad filepath for potential file deletion from Google Cloud Storage
+        ad_data = ad_doc.to_dict()
+        ad_filepath = ad_data.get('filepath')
+
+        if ad_filepath:
+            delete_file_from_gcs(ad_filepath)
+
+        # Delete the ad from the ads collection
+        ad_ref.delete()
+
+        # 2. Remove the ad from the user's ad_ids array
+        user_ref = users_collection.document(user_id)
+        user_ref.update({
+            'ad_ids': firestore.ArrayRemove([ad_id])
+        })
+        
+        # 3. Remove the ad from the project's ad_ids array
+        project_ref = projects_collection.document(project_id)
+        project_ref.update({
+            'ad_ids': firestore.ArrayRemove([ad_id])
+        })
+        
+        return jsonify({"message": "Ad deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
 
 
 # -- END ROUTES --
