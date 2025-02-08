@@ -67,108 +67,106 @@ const BlitzGame = () => {
   }, [handleKeyPress]);
 
   return (
-    <Container maxWidth="sm" sx={{ textAlign: "center", mt: 4 }}>
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100%",
+        position: "relative",
+        paddingTop: "20px",
+      }}
+    >
+      {/* Logo - Stays at the Top */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
         <img
           src={BlitzLogo}
           alt="Blitz Logo"
-          style={{ width: "350px", height: "auto" }}
+          style={{ width: "400px", height: "auto" }}
         />
       </Box>
 
+      {/* === TIMER & SCORE ABOVE THE VIDEO === */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
           width: "100%",
-          px: 2,
-          mt: 2,
+          maxWidth: "500px", // Align with video size
+          marginTop: "100px", // Moves it above the video
+          zIndex: 3,
         }}
       >
-        {/* Timer (formatted as MM:SS) */}
+        {/* Timer (Left) */}
         <Typography
-          variant="h6"
+          variant="h4"
           sx={{
-            fontFamily: "'Press Start 2P', sans-serif", // Example font
-            fontSize: "20px",
+            fontFamily: "'Press Start 2P', sans-serif",
+            fontSize: "24px",
             fontWeight: "bold",
             color: "#007FFF",
+            backgroundColor: "rgba(0, 0, 0, 0.7)", // Adds contrast
+            padding: "6px 12px",
+            borderRadius: "8px",
           }}
         >
           {String(Math.floor(timer / 60)).padStart(2, "0")}:
           {String(timer % 60).padStart(2, "0")}
         </Typography>
 
-        {/* Score in Top Right */}
+        {/* Score (Right) */}
         <Typography
-          variant="h5"
+          variant="h4"
           sx={{
-            fontFamily: "'Bebas Neue', sans-serif", // Example font
+            fontFamily: "'Bebas Neue', sans-serif",
             fontSize: "24px",
             fontWeight: "bold",
             color: "#FF5722",
+            backgroundColor: "rgba(0, 0, 0, 0.7)", // Adds contrast
+            padding: "6px 12px",
+            borderRadius: "8px",
           }}
         >
           {score}
         </Typography>
       </Box>
 
-      {isGameOver ? (
-        <>
-          <Typography variant="h5" sx={{ mt: 2 }}>
-            Game Over!
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{ mt: 2 }}
-            onClick={() => navigate("/")}
-          >
-            Home
-          </Button>
-        </>
-      ) : (
+      {/* Video Box - Larger Size */}
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          maxWidth: "500px", // Keeps video large
+          aspectRatio: "9 / 16",
+          borderRadius: "16px",
+          overflow: "hidden",
+        }}
+      >
+        {/* AD & REAL Labels - Positioned Properly Outside Video */}
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
             width: "100%",
-            position: "relative", // Needed for absolute positioning
+            maxWidth: "800px", // Ensures alignment with the video
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)", // Center align with video
+            zIndex: 3, // Ensures labels appear above everything
+            pointerEvents: "none", // Prevents interference with clicks
           }}
         >
-          {/* Left Label (Ad) */}
-          <Typography
-            variant="h5"
-            sx={{
-              position: "absolute",
-              left: "-12%", // Moves it closer to the edge
-              top: "50%", // Centers vertically
-
-              color: "red",
-              opacity: 0.6,
-              fontWeight: "bold",
-            }}
-          >
-            ⬅️ AD
-          </Typography>
-
-          {/* Right Label (Real Video) */}
-          <Typography
-            variant="h5"
-            sx={{
-              position: "absolute",
-              right: "-20%", // Moves it closer to the edge
-              top: "50%", // Centers vertically
-
-              color: "green",
-              opacity: 0.6,
-              fontWeight: "bold",
-            }}
-          >
-            REAL ➡️
-          </Typography>
-
           {/* Video */}
           <AnimatePresence>
             <motion.div
@@ -177,38 +175,75 @@ const BlitzGame = () => {
               animate={{
                 x:
                   swipeDirection === "left"
-                    ? -300
+                    ? -400
                     : swipeDirection === "right"
-                    ? 300
+                    ? 400
                     : 0,
                 opacity: swipeDirection ? 0 : 1,
               }}
               transition={{ duration: 0.3 }}
               style={{
                 width: "100%",
-                maxWidth: "360px",
-                aspectRatio: "9 / 16",
-                borderRadius: "12px",
-                overflow: "hidden",
+                height: "100%",
                 position: "relative",
+                zIndex: 1, // Ensures video stays behind
               }}
             >
               <video
-                src={videoData[currentIndex].url}
+                src={videoData[currentIndex]?.url}
                 controls
                 autoPlay
                 style={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "12px",
+                  objectFit: "cover", // Crop landscape videos to fit portrait
+                  borderRadius: "16px",
                 }}
+                onError={(e) =>
+                  console.error("Error loading video:", e.target.src)
+                }
               />
             </motion.div>
           </AnimatePresence>
         </Box>
-      )}
-    </Container>
+      </Box>
+
+      {/* AD Label (Left, Outside Video) */}
+      <Typography
+        variant="h4"
+        sx={{
+          position: "absolute",
+          left: "35px", // Moves further left
+          color: "red",
+          opacity: 1,
+          fontWeight: "bold",
+          backgroundColor: "rgba(0, 0, 0, 0.8)", // Adds contrast
+          padding: "8px 16px",
+          borderRadius: "12px",
+          whiteSpace: "nowrap", // Ensures text doesn’t break
+        }}
+      >
+        ⬅️ AD
+      </Typography>
+
+      {/* REAL Label (Right, Outside Video) */}
+      <Typography
+        variant="h4"
+        sx={{
+          position: "absolute",
+          right: "-10px", // Moves further right
+          color: "green",
+          opacity: 1,
+          fontWeight: "bold",
+          backgroundColor: "rgba(0, 0, 0, 0.8)", // Adds contrast
+          padding: "8px 16px",
+          borderRadius: "12px",
+          whiteSpace: "nowrap", // Ensures text doesn’t break
+        }}
+      >
+        REAL ➡️
+      </Typography>
+    </Box>
   );
 };
 
