@@ -22,30 +22,27 @@ const LoginPage = () => {
     event.preventDefault();
     console.log("Login Attempted with:", { username, password });
 
-    // DUMMY FOR NOW
-    alert("Login successful! (Dummy Login)");
-    navigate("/dashboard");
-
-    //     const response = await fetch("http://localhost:5000/api/login", {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify({
-    //         action: "login",
-    //         username: username,
-    //         password: password,
-    //       }),
-    //     });
-    //     const data = await response.json();
-    //     if (data.status === "success") {
-    //       // Store user id in context
-    //       setUserId(data.userId);
-    //       // Redirect to dashboard
-    //       navigate("/dashboard");
-    //     } else {
-    //       setLoginError(data.message);
-    //     }
+    const response = await fetch("http://localhost:5000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    });
+    const data = await response.json();
+    if (data.status === "success") {
+      // Store user id in context
+      console.log(data.user_id)
+      // setUserId(data.userId);
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } else {
+      console.log(data.error);
+      // setLoginError(data.message);
+    }
   };
 
   return (

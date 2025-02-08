@@ -16,21 +16,47 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    // Validate the input
     if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
       alert("All fields are required!");
       return;
     }
+
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
-    // TODO: Store user data (dummy registration for now)
-    alert("Registration successful! Now log in.");
+    // Prepare data to send to Flask backend
+    const userData = {
+      username,
+      password,
+    };
 
-    // Redirect to login page
-    navigate("/login");
+    try {
+      // Send the POST request to Flask backend for user registration
+      const response = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      // Handle the response from Flask
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Registration successful! Now log in.");
+        navigate("/login"); // Redirect to login page
+      } else {
+        alert(data.error || "An error occurred. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Something went wrong. Please try again later.");
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from google.cloud import firestore, storage
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -9,6 +10,7 @@ load_dotenv()
 
 # initialize flask app
 app = Flask(__name__)
+CORS(app)
 
 # initialize firestore and cloud storage clients
 db = firestore.Client()
@@ -28,7 +30,7 @@ BUCKET_NAME = 'instagram-videos-bucket'
 # -- ROUTES -- 
 
 # endpoint for user registration
-@app.route('/register', methods=['POST'])
+@app.route('/api/register', methods=['POST'])
 def register():
     data = request.get_json()
     username = data.get('username')
@@ -45,18 +47,20 @@ def register():
     # hash the password before storing it
     hashed_password = generate_password_hash(password)
     
-    # store user in db
+    # add user to db
     new_user = {
         'username': username,
         'password': hashed_password,
     }
-    
     user_ref = users_collection.add(new_user)
-    return jsonify({"message": "User registered successfully", "user_id": user_ref.id}), 201
+    user_id = user_ref.id
+    
+    return jsonify({"message": "User registered successfully", "user_id": user_id}), 201
+
 
 
 # endpoint for user login
-@app.route('/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
@@ -77,7 +81,7 @@ def login():
     if not check_password_hash(user_data['password'], password):
         return jsonify({"error": "Invalid credentials"}), 401
     
-    return jsonify({"message": "Login successful", "user_id": user_ref[0].id}), 200
+    return jsonify({"status": "success", "user_id": user_ref[0].id}), 200
 
 
 if __name__ == '__main__':
