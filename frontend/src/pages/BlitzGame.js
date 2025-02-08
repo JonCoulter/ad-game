@@ -12,16 +12,14 @@ const BlitzGame = () => {
 
   const fetchRandomVideo = async () => {
     try {
-      const response = await fetch("/api/get_random_video");
+      const response = await fetch("http://localhost:5000/api/get_random_video");
+      const data = await response.json();
 
-      // Log full response before parsing
-      console.log("Raw response:", response);
-
-      const text = await response.text();
-      console.log("Response text:", text); // Log what the backend is actually sending
-
-      const data = JSON.parse(text); // Convert text to JSON manually
-      setCurrentVideo({ url: data.signed_url, type: data.video_type });
+      if (data.signed_url) {
+        setCurrentVideo({ url: data.signed_url, type: data.video_type });
+      } else {
+        console.error("No signed URL received.");
+      }
     } catch (error) {
       console.error("Error fetching video:", error);
     }
@@ -173,9 +171,10 @@ const BlitzGame = () => {
                   objectFit: "cover",
                   borderRadius: "16px",
                 }}
-                onError={(e) =>
-                  console.error("Error loading video:", e.target.src)
-                }
+                onError={(e) => {
+                  console.error("Error loading video:", e.target.src);
+                  fetchRandomVideo(); // Fetch another video if current one fails
+                }}
               />
             </motion.div>
           )}
