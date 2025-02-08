@@ -51,9 +51,8 @@ const LandingPage = () => {
       >
         February 7, 2025
         <br />
-        No. 1329
+        Tartan Hacks Submission
         <br />
-        Edited by Tracy Bennett
       </Typography>
     </Container>
   );
