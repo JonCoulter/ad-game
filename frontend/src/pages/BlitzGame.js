@@ -12,7 +12,9 @@ const BlitzGame = () => {
 
   const fetchRandomVideo = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/get_random_video");
+      const response = await fetch(
+        "http://localhost:5000/api/get_random_video"
+      );
       const data = await response.json();
 
       if (data.signed_url) {
