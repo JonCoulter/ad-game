@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 // import BlitzLogo from "../assets/blitz-logo-removebg-preview.png";
 import logo from "../assets/LOGO.png";
 
-
 const BlitzGame = () => {
   const [score, setScore] = useState(0);
   const [timer, setTimer] = useState(5);
@@ -89,9 +88,10 @@ const BlitzGame = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        width: "99%",
+        width: "100%",
         position: "relative",
         paddingTop: "20px",
+        backgroundColor: "#ADD8E6",
       }}
     >
       {/* Logo */}
@@ -160,14 +160,14 @@ const BlitzGame = () => {
           >
             <Typography
               variant="h4"
-              sx={{ fontSize: "28x", fontWeight: "bold", color: "#007FFF" }}
+              sx={{ fontSize: "28x", fontWeight: "bold", color: "white" }}
             >
               {String(Math.floor(timer / 60)).padStart(2, "0")}:
               {String(timer % 60).padStart(2, "0")}
             </Typography>
             <Typography
               variant="h4"
-              sx={{ fontSize: "28px", fontWeight: "bold", color: "#FF5722" }}
+              sx={{ fontSize: "28px", fontWeight: "bold", color: "white" }}
             >
               {score}
             </Typography>
@@ -176,7 +176,6 @@ const BlitzGame = () => {
           {/* Video Box */}
           <Box
             sx={{
-
               position: "relative",
               width: "100%",
               maxWidth: "500px",
