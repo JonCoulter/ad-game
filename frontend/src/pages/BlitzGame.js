@@ -1,22 +1,36 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Typography, Button, Container } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import BlitzLogo from "../assets/blitz-logo-removebg-preview.png";
-import LocalVideo from "../assets/ad-59.mp4";
-
-const videoData = [
-  { url: LocalVideo, type: "real" },
-  { url: "https://www.w3schools.com/html/movie.mp4", type: "ad" },
-];
 
 const BlitzGame = () => {
-  const navigate = useNavigate();
   const [score, setScore] = useState(0);
   const [timer, setTimer] = useState(60);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [currentVideo, setCurrentVideo] = useState(null);
   const [swipeDirection, setSwipeDirection] = useState(null);
+
+  const fetchRandomVideo = async () => {
+    try {
+      const response = await fetch("/api/get_random_video");
+
+      // Log full response before parsing
+      console.log("Raw response:", response);
+
+      const text = await response.text();
+      console.log("Response text:", text); // Log what the backend is actually sending
+
+      const data = JSON.parse(text); // Convert text to JSON manually
+      setCurrentVideo({ url: data.signed_url, type: data.video_type });
+    } catch (error) {
+      console.error("Error fetching video:", error);
+    }
+  };
+
+  // Fetch the first video on component mount
+  useEffect(() => {
+    fetchRandomVideo();
+  }, []);
 
   // Timer logic
   useEffect(() => {
@@ -31,40 +45,36 @@ const BlitzGame = () => {
   // Handle swipe logic
   const handleSwipe = useCallback(
     (direction) => {
-      if (isGameOver) return;
+      if (isGameOver || !currentVideo) return;
 
-      const currentVideo = videoData[currentIndex];
       const isCorrect =
         (direction === "right" && currentVideo.type === "real") ||
         (direction === "left" && currentVideo.type === "ad");
 
-      setSwipeDirection(direction); // Trigger animation
+      setSwipeDirection(direction);
 
       setTimeout(() => {
         setScore((prev) => prev + (isCorrect ? 1 : -1));
-        setCurrentIndex((prev) => (prev + 1) % videoData.length);
-        setSwipeDirection(null); // Reset animation
+        fetchRandomVideo(); // Fetch a new video after swiping
+        setSwipeDirection(null);
       }, 300);
     },
-    [currentIndex, isGameOver] // Dependencies
+    [currentVideo, isGameOver]
   );
 
   // Handle key presses for left/right
-  const handleKeyPress = useCallback(
-    (event) => {
+  useEffect(() => {
+    const handleKeyPress = (event) => {
       if (event.key === "ArrowRight") {
         handleSwipe("right");
       } else if (event.key === "ArrowLeft") {
         handleSwipe("left");
       }
-    },
-    [handleSwipe] // ✅ Add handleSwipe as a dependency
-  );
+    };
 
-  useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handleKeyPress]);
+  }, [handleSwipe]);
 
   return (
     <Box
@@ -95,82 +105,46 @@ const BlitzGame = () => {
         />
       </Box>
 
-      {/* === TIMER & SCORE ABOVE THE VIDEO === */}
+      {/* Timer & Score */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           width: "100%",
-          maxWidth: "500px", // Align with video size
-          marginTop: "100px", // Moves it above the video
-          zIndex: 3,
+          maxWidth: "500px",
+          marginTop: "100px",
         }}
       >
-        {/* Timer (Left) */}
         <Typography
           variant="h4"
-          sx={{
-            fontFamily: "'Press Start 2P', sans-serif",
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: "#007FFF",
-            backgroundColor: "rgba(0, 0, 0, 0.7)", // Adds contrast
-            padding: "6px 12px",
-            borderRadius: "8px",
-          }}
+          sx={{ fontSize: "24px", fontWeight: "bold", color: "#007FFF" }}
         >
           {String(Math.floor(timer / 60)).padStart(2, "0")}:
           {String(timer % 60).padStart(2, "0")}
         </Typography>
-
-        {/* Score (Right) */}
         <Typography
           variant="h4"
-          sx={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: "#FF5722",
-            backgroundColor: "rgba(0, 0, 0, 0.7)", // Adds contrast
-            padding: "6px 12px",
-            borderRadius: "8px",
-          }}
+          sx={{ fontSize: "24px", fontWeight: "bold", color: "#FF5722" }}
         >
           {score}
         </Typography>
       </Box>
 
-      {/* Video Box - Larger Size */}
+      {/* Video Box */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          maxWidth: "500px", // Keeps video large
+          maxWidth: "500px",
           aspectRatio: "9 / 16",
           borderRadius: "16px",
           overflow: "hidden",
         }}
       >
-        {/* AD & REAL Labels - Positioned Properly Outside Video */}
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: "800px", // Ensures alignment with the video
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)", // Center align with video
-            zIndex: 3, // Ensures labels appear above everything
-            pointerEvents: "none", // Prevents interference with clicks
-          }}
-        >
-          {/* Video */}
-          <AnimatePresence>
+        <AnimatePresence>
+          {currentVideo && (
             <motion.div
-              key={currentIndex}
+              key={currentVideo.url}
               initial={{ x: 0, opacity: 1 }}
               animate={{
                 x:
@@ -186,17 +160,17 @@ const BlitzGame = () => {
                 width: "100%",
                 height: "100%",
                 position: "relative",
-                zIndex: 1, // Ensures video stays behind
+                zIndex: 1,
               }}
             >
               <video
-                src={videoData[currentIndex]?.url}
+                src={currentVideo.url}
                 controls
                 autoPlay
                 style={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover", // Crop landscape videos to fit portrait
+                  objectFit: "cover",
                   borderRadius: "16px",
                 }}
                 onError={(e) =>
@@ -204,41 +178,33 @@ const BlitzGame = () => {
                 }
               />
             </motion.div>
-          </AnimatePresence>
-        </Box>
+          )}
+        </AnimatePresence>
       </Box>
 
-      {/* AD Label (Left, Outside Video) */}
+      {/* AD & REAL Labels */}
       <Typography
         variant="h4"
         sx={{
           position: "absolute",
-          left: "35px", // Moves further left
+          left: "35px",
           color: "red",
-          opacity: 1,
           fontWeight: "bold",
-          backgroundColor: "rgba(0, 0, 0, 0.8)", // Adds contrast
           padding: "8px 16px",
           borderRadius: "12px",
-          whiteSpace: "nowrap", // Ensures text doesn’t break
         }}
       >
         ⬅️ AD
       </Typography>
-
-      {/* REAL Label (Right, Outside Video) */}
       <Typography
         variant="h4"
         sx={{
           position: "absolute",
-          right: "-10px", // Moves further right
+          right: "-10px",
           color: "green",
-          opacity: 1,
           fontWeight: "bold",
-          backgroundColor: "rgba(0, 0, 0, 0.8)", // Adds contrast
           padding: "8px 16px",
           borderRadius: "12px",
-          whiteSpace: "nowrap", // Ensures text doesn’t break
         }}
       >
         REAL ➡️
