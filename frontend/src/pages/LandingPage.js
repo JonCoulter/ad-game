@@ -1,11 +1,13 @@
 // src/pages/LandingPage.js
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Container } from "@mui/material";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   return (
     <Container maxWidth="sm" sx={{ textAlign: "center", mt: 8 }}>
-      {/* Logo (Placeholder for now, replace with an actual image if needed) */}
+      {}
       <Box
         sx={{
           display: "flex",
@@ -31,19 +33,22 @@ const LandingPage = () => {
 
       {/* Subtitle */}
       <Typography variant="subtitle1" sx={{ mt: 1, mb: 4 }}>
-        Get 6 chances to detect if a video is an ad or not.
+        Not everything is what it seems... can you spot the ads?
       </Typography>
 
       {/* Buttons */}
       <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-        <Button variant="outlined" sx={{ borderRadius: "24px", px: 4 }}>
+        <Button
+          variant="outlined"
+          sx={{ borderRadius: "24px", px: 4 }}
+          onClick={() => navigate("/login")} // ✅ Correct navigation
+        >
           Log in
         </Button>
         <Button variant="contained" sx={{ borderRadius: "24px", px: 4 }}>
           Blitz
         </Button>
       </Box>
-
       {/* Footer */}
       <Typography
         variant="caption"

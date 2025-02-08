@@ -1,10 +1,15 @@
 // src/pages/LoginPage.js
 import React, { useState } from "react";
-import { useAuth } from "../AuthContext";
+import { useAuth } from "../AuthContext"; // ✅ Ensure correct path
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, Typography, Container } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Container,
+  Button,
+} from "@mui/material"; // ✅ Use MUI's Button
 import InputField from "../components/InputField";
-import Button from "../components/Button";
 
 const LoginPage = () => {
   const { setUserId } = useAuth();
@@ -12,12 +17,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    if (inputId.trim() !== "") {
-      setUserId(inputId);
-      navigate("/dashboard");
-    } else {
-      alert("Please enter a valid User ID.");
-    }
+    console.log("✅ Login button clicked!"); // Debugging log
   };
 
   return (
@@ -32,7 +32,10 @@ const LoginPage = () => {
             value={inputId}
             onChange={(e) => setInputId(e.target.value)}
           />
-          <Button text="Log In" onClick={handleLogin} />
+          {/* ✅ Ensure handleLogin is passed correctly */}
+          <Button variant="contained" color="primary" onClick={handleLogin}>
+            Log in
+          </Button>
         </CardContent>
       </Card>
     </Container>
