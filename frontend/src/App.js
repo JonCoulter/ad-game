@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Container,
+} from "@mui/material";
+import LandingPage from "./pages/LandingPage";
 
-function App() {
+// Create a simple theme
+const theme = createTheme();
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Container maxWidth="md">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+          </Routes>
+        </Container>
+      </Router>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;
