@@ -45,6 +45,7 @@ def upload_file_to_gcs(file, filename):
     bucket = storage_client.bucket(BUCKET_NAME)
     blob = bucket.blob(f"ads/{filename}")
     blob.upload_from_file(file)
+    return blob.public_url
 
 # -- END FUNCTIONS --
 
@@ -169,25 +170,26 @@ def create_project():
 
 @app.route('/api/upload_ad', methods=['POST'])
 def upload_ad():
-    # need frontend to make http request with user_id
-    data = request.get_json()
-    user_id = data.get('user_id')
-    project_id = data.get('project_id')
-    ad_name = data.get('ad_name')
+    user_id = request.form.get('user_id')
+    project_id = request.form.get('project_id')
+    ad_name = request.form.get('ad_name')
     
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
     file = request.files['file']
-
+    
+    if not ad_name:
+        return jsonify({"error": "Ad name is required"}), 400
+    
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    if file and allowed_file(file.filename):        
+    if file and allowed_file(file.filename):
         try:
-            # upload the file to google cloud storage
-            file_url = upload_file_to_gcs(file, file.filename)
-            
-            # store the file URL in Firestore or a database here
+            # save file to GCS
+            file_url = upload_file_to_gcs(file, secure_filename(file.filename))
+
+            # store the ad data in db
             ad_data = {
                 'creator_id': user_id,
                 'project_id': project_id,
@@ -197,16 +199,31 @@ def upload_ad():
                 'incorrect_guesses': 0,
                 'timestamp': datetime.now(),
             }
-            ads_collection.add(ad_data)
+            ad_ref = ads_collection.add(ad_data)
+            
+            # get the ad_id from the newly created ad
+            ad_id = ad_ref[1].id
+            
+            # update the user's ad_ids array
+            user_ref = users_collection.document(user_id)    
+            user_ref.update({
+                'ad_ids': firestore.ArrayUnion([ad_id])
+            })
+            
+            # update the projects's ad_ids array
+            project_ref = projects_collection.document(project_id)
+            project_ref.update({
+                'ad_ids': firestore.ArrayUnion([ad_id])
+            })
             
             return jsonify({"message": "File uploaded successfully", "file_url": file_url}), 200
-        except DefaultCredentialsError:
-            return jsonify({"error": "Google Cloud credentials not found"}), 500
+        except Exception as e:
+            return jsonify({"error": f"Error uploading file: {str(e)}"}), 500
     else:
         return jsonify({"error": f"Invalid file type. Only files of type {ALLOWED_EXTENSIONS} are allowed."}), 400
     
     
-@app.route('/api/get_user_data', methods=['GET'])
+@app.route('/api/get_user_data', methods=['POST'])
 def get_user_data():
     data = request.get_json()
     user_id = data.get('user_id')
@@ -215,6 +232,16 @@ def get_user_data():
         return jsonify({'error': 'User ID is required'}), 400
     
     projects = []
+    username = None
+    
+    # get the user's data (including username)
+    user_ref = users_collection.document(user_id).get()
+    
+    if user_ref.exists:
+        user_data = user_ref.to_dict()
+        username = user_data.get('username')
+    else:
+        return jsonify({'error': 'User not found'}), 400
     
     # get the user's projects
     projects_ref = projects_collection.where("creator_id", "==", user_id).get()
@@ -238,56 +265,11 @@ def get_user_data():
         # add project data with ads
         projects.append({
             'project_name': project_data['project_name'],
-            'ads': project_ads
+            'project_id': project.id,
+            'ads': project_ads,
         })
     
-    return jsonify({'user_id': user_id, 'projects': projects}), 200
-
-""" sample response from this route
-    
-{
-  "user_id": "user123",
-  "projects": [
-    {
-      "project_name": "Project 1",
-      "ads": [
-        {
-          "creator_id": "user123",
-          "project_id": "project123",
-          "ad_name": "Ad 1",
-          "filepath": "gs://bucket/ad1.mp4",
-          "correct_guesses": 5,
-          "incorrect_guesses": 2,
-          "timestamp": "2025-02-07T12:34:56.123456"
-        },
-        {
-          "creator_id": "user123",
-          "project_id": "project123",
-          "ad_name": "Ad 2",
-          "filepath": "gs://bucket/ad2.mp4",
-          "correct_guesses": 8,
-          "incorrect_guesses": 1,
-          "timestamp": "2025-02-07T12:36:56.123456"
-        }
-      ]
-    },
-    {
-      "project_name": "Project 2",
-      "ads": [
-        {
-          "creator_id": "user123",
-          "project_id": "project124",
-          "ad_name": "Ad 3",
-          "filepath": "gs://bucket/ad3.mp4",
-          "correct_guesses": 7,
-          "incorrect_guesses": 3,
-          "timestamp": "2025-02-07T12:38:56.123456"
-        }
-      ]
-    }
-  ]
-}
-"""
+    return jsonify({'user_id': user_id, 'username': username, 'projects': projects}), 200
 
 
 @app.route('/api/update_ad_data', methods=['POST'])
