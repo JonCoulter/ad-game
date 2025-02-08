@@ -48,7 +48,7 @@ const BlitzGame = () => {
       if (isGameOver || !currentVideo) return;
 
       const isCorrect =
-        (direction === "right" && currentVideo.type === "real") ||
+        (direction === "right" && currentVideo.type === "real_video") ||
         (direction === "left" && currentVideo.type === "ad");
 
       setSwipeDirection(direction);
