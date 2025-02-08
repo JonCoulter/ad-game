@@ -45,7 +45,11 @@ const LandingPage = () => {
         >
           Log in
         </Button>
-        <Button variant="contained" sx={{ borderRadius: "24px", px: 4 }}>
+        <Button
+          variant="contained"
+          sx={{ borderRadius: "24px", px: 4 }}
+          onClick={() => navigate("/BlitzGame")}
+        >
           Blitz
         </Button>
       </Box>

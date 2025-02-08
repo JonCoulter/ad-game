@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Container } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+import BlitzLogo from "../assets/blitz-logo-removebg-preview.png";
+import LocalVideo from "../assets/ad-59.mp4";
 
 const videoData = [
-  { url: "https://www.w3schools.com/html/mov_bbb.mp4", type: "real" },
+  { url: LocalVideo, type: "real" },
   { url: "https://www.w3schools.com/html/movie.mp4", type: "ad" },
 ];
 
@@ -66,11 +68,51 @@ const BlitzGame = () => {
 
   return (
     <Container maxWidth="sm" sx={{ textAlign: "center", mt: 4 }}>
-      <Typography variant="h4" fontWeight="bold">
-        Blitz Mode
-      </Typography>
-      <Typography variant="h6">Time Left: {timer}s</Typography>
-      <Typography variant="h6">Score: {score}</Typography>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        <img
+          src={BlitzLogo}
+          alt="Blitz Logo"
+          style={{ width: "350px", height: "auto" }}
+        />
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+          px: 2,
+          mt: 2,
+        }}
+      >
+        {/* Timer (formatted as MM:SS) */}
+        <Typography
+          variant="h6"
+          sx={{
+            fontFamily: "'Press Start 2P', sans-serif", // Example font
+            fontSize: "20px",
+            fontWeight: "bold",
+            color: "#007FFF",
+          }}
+        >
+          Time Left: {String(Math.floor(timer / 60)).padStart(2, "0")}:
+          {String(timer % 60).padStart(2, "0")}
+        </Typography>
+
+        {/* Score in Top Right */}
+        <Typography
+          variant="h5"
+          sx={{
+            fontFamily: "'Bebas Neue', sans-serif", // Example font
+            fontSize: "24px",
+            fontWeight: "bold",
+            color: "#FF5722",
+          }}
+        >
+          Score: {score}
+        </Typography>
+      </Box>
 
       {isGameOver ? (
         <>
@@ -103,19 +145,22 @@ const BlitzGame = () => {
               transition={{ duration: 0.3 }}
               style={{
                 width: "100%",
-                height: "100%",
+                aspectRatio: "9 / 16", // ✅ Forces 9:16 portrait mode
                 borderRadius: "12px",
                 overflow: "hidden",
-                position: "absolute",
-                top: 0,
-                left: 0,
+                position: "relative",
               }}
             >
               <video
                 src={videoData[currentIndex].url}
                 controls
                 autoPlay
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover", // ✅ Ensures the video fills the frame
+                  borderRadius: "12px",
+                }}
               />
             </motion.div>
           </AnimatePresence>
