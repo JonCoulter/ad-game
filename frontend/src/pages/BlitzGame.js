@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import BlitzLogo from "../assets/blitz-logo-removebg-preview.png";
+// import BlitzLogo from "../assets/blitz-logo-removebg-preview.png";
+import logo from "../assets/LOGO.png";
+
 
 const BlitzGame = () => {
   const [score, setScore] = useState(0);
@@ -103,9 +105,9 @@ const BlitzGame = () => {
         }}
       >
         <img
-          src={BlitzLogo}
+          src={logo}
           alt="Blitz Logo"
-          style={{ width: "400px", height: "auto" }}
+          style={{ width: "200px", height: "auto" }}
         />
       </Box>
 
@@ -158,14 +160,14 @@ const BlitzGame = () => {
           >
             <Typography
               variant="h4"
-              sx={{ fontSize: "24px", fontWeight: "bold", color: "#007FFF" }}
+              sx={{ fontSize: "28x", fontWeight: "bold", color: "#007FFF" }}
             >
               {String(Math.floor(timer / 60)).padStart(2, "0")}:
               {String(timer % 60).padStart(2, "0")}
             </Typography>
             <Typography
               variant="h4"
-              sx={{ fontSize: "24px", fontWeight: "bold", color: "#FF5722" }}
+              sx={{ fontSize: "28px", fontWeight: "bold", color: "#FF5722" }}
             >
               {score}
             </Typography>
@@ -174,6 +176,7 @@ const BlitzGame = () => {
           {/* Video Box */}
           <Box
             sx={{
+
               position: "relative",
               width: "100%",
               maxWidth: "500px",
@@ -229,10 +232,11 @@ const BlitzGame = () => {
           <Typography
             variant="h4"
             sx={{
+              fontFamily: "LogoFont, sans-serif",
               position: "absolute",
               left: "35px",
               color: "red",
-              fontWeight: "bold",
+              fontWeight: "normal",
               padding: "8px 16px",
               borderRadius: "12px",
               zIndex: 2,
@@ -243,10 +247,11 @@ const BlitzGame = () => {
           <Typography
             variant="h4"
             sx={{
+              fontFamily: "LogoFont, sans-serif",
               position: "absolute",
               right: "35px",
               color: "green",
-              fontWeight: "bold",
+              fontWeight: "normal",
               padding: "8px 16px",
               borderRadius: "12px",
               zIndex: 2,
