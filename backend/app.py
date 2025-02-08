@@ -1,7 +1,9 @@
 import os
+import random
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from datetime import timedelta
 from google.cloud import firestore, storage
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -24,7 +26,7 @@ users_collection = db.collection('users')
 ads_collection = db.collection('ads')
 
 # firestore and google cloud storage configuration
-BUCKET_NAME = 'instagram-videos-bucket'
+BUCKET_NAME = 'instagram-video-bucket'
 
 
 # -- ROUTES -- 
@@ -82,6 +84,36 @@ def login():
     
     return jsonify({'status': 'success', 'user_id': user_ref[0].id}), 200
 
+
+@app.route('/api/get_random_video', methods=['GET'])
+def get_random_video():
+    # choose a random video type
+    folders = ['ads', 'real_videos']
+    folder = random.choice(folders)
+    
+    # get a random video filename
+    all_videos = []
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blobs = bucket.list_blobs(prefix=f'{folder}/')
+    for blob in blobs:
+        if blob.name.endswith('.mp4'):
+            all_videos.append(blob.name)
+    video_filename = random.choice(all_videos)
+    
+    # get video
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blob = bucket.blob(f'{video_filename}')
+    
+    # make signed url for the video, expires in 10 mins
+    signed_url = blob.generate_signed_url(
+        expiration=timedelta(minutes=10),
+        method='GET',
+    )
+    
+    # get video type
+    video_type = folder[:-1]
+    
+    return jsonify({'signed_url': signed_url, 'video_type': video_type, 'video_filename': video_filename})
 
 
 
