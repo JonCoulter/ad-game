@@ -15,19 +15,21 @@ const LandingPage = () => {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "#75b3d0",
+        overflow: "hidden",
+        position: "relative",
       }}
     >
-      <Container maxWidth="sm" sx={{ textAlign: "center", mt: 8 }}>
+      <Container maxWidth="sm" sx={{ textAlign: "center", mt: 2, pt: 2 }}>
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            width: "80px",
-            height: "80px",
+            width: "100px",
+            height: "100px",
             borderRadius: "8px",
             mx: "auto",
-            mb: 2,
+            mb: 3,
           }}
         >
           <Box
@@ -35,20 +37,20 @@ const LandingPage = () => {
             src={logo}
             alt="AdVera Logo"
             sx={{
-              width: "200px", // Adjust size as needed
-              height: "150px",
+              width: "250px", // Increased size
+              height: "200px",
               mx: "auto",
-              mb: 2,
+              mb: 3,
             }}
           />
         </Box>
 
         {/* Title */}
         <Typography
-          variant="h3"
+          variant="h2"
           sx={{
             fontFamily: "LogoFont, sans-serif",
-            fontSize: "3rem",
+            fontSize: "4rem",
             color: "#f6ffdd",
           }}
         >
@@ -57,47 +59,51 @@ const LandingPage = () => {
 
         {/* Subtitle */}
         <Typography
-          variant="subtitle1"
+          variant="h5"
           sx={{
-            mt: 1,
-            mb: 4,
-            fontSize: "1.2rem", // Change font size
-            fontWeight: "bold", // Change font weight
-            fontFamily: "'League Spartan', sans-serif", // Use a custom font
+            mt: 2,
+            mb: 5,
+            fontSize: "1.5rem", // Increased size
+            fontWeight: "bold",
+            fontFamily: "'League Spartan', sans-serif",
             color: "#333",
           }}
         >
-          Not everything is what it seems... can you spot the ads?
+          Guess if a video is advertisement or regular content!
         </Typography>
 
         {/* Buttons */}
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
           <Button
             variant="outlined"
             sx={{
-              borderRadius: "24px",
-              px: 4,
+              borderRadius: "32px",
+              px: 5,
+              py: 1.5,
+              fontSize: "1.2rem",
               color: "white",
               borderColor: "white",
               backgroundColor: "#75b3d0",
-              fontFamily: "'League Spartan', sans-serif", // Matching font
+              fontFamily: "'League Spartan', sans-serif",
               "&:hover": {
                 backgroundColor: "white",
                 color: "#75b3d0",
               },
             }}
-            onClick={() => navigate("/login")} // ✅ Correct navigation
+            onClick={() => navigate("/login")}
           >
             Log in
           </Button>
           <Button
             variant="contained"
             sx={{
-              borderRadius: "24px",
-              px: 4,
+              borderRadius: "32px",
+              px: 5,
+              py: 1.5,
+              fontSize: "1.2rem",
               backgroundColor: "white",
               color: "#75b3d0",
-              fontFamily: "'League Spartan', sans-serif", // Matching font
+              fontFamily: "'League Spartan', sans-serif",
               "&:hover": {
                 backgroundColor: "#e0e0e0",
               },
@@ -109,8 +115,8 @@ const LandingPage = () => {
         </Box>
         {/* Footer */}
         <Typography
-          variant="caption"
-          sx={{ display: "block", mt: 4, color: "white" }}
+          variant="h6"
+          sx={{ display: "block", mt: 5, color: "white" }}
         >
           February 7, 2025
           <br />
