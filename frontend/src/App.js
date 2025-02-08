@@ -5,6 +5,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import BlitzGame from "./pages/BlitzGame";
+import Dashboard from "./pages/Dashboard";
 import {
   ThemeProvider,
   createTheme,
@@ -25,6 +26,7 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/BlitzGame" element={<BlitzGame />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Container>
     </ThemeProvider>

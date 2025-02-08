@@ -13,9 +13,10 @@ import {
 } from "@mui/material";
 
 const LoginPage = () => {
+  const { userId, setUserId } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //   const [loginError, setLoginError] = useState("");
+  const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
@@ -35,13 +36,14 @@ const LoginPage = () => {
     const data = await response.json();
     if (data.status === "success") {
       // Store user id in context
-      console.log(data.user_id)
-      // setUserId(data.userId);
+      console.log(data.user_id);
+      setUserId(data.user_id);
+
       // Redirect to dashboard
       navigate("/dashboard");
     } else {
       console.log(data.error);
-      // setLoginError(data.message);
+      setLoginError(data.message);
     }
   };
 
