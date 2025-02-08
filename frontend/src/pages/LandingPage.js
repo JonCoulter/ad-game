@@ -118,7 +118,7 @@ const LandingPage = () => {
           variant="h6"
           sx={{ display: "block", mt: 5, color: "white" }}
         >
-          February 7, 2025
+          February 8, 2025
           <br />
           Tartan Hacks Submission
           <br />
