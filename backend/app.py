@@ -17,7 +17,7 @@ db = firestore.Client()
 storage_client = storage.Client()
 
 # get the google cloud credentials from the environment variable
-GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
 # reference to the firestore users collection
 users_collection = db.collection('users')
@@ -37,12 +37,12 @@ def register():
     password = data.get('password')
     
     if not username or not password:
-        return jsonify({"error": "Username and password are required"}), 400
+        return jsonify({'error': 'Username and password are required'}), 400
     
     # check if the user already exists
     existing_user = users_collection.where('username', '==', username).get()
     if existing_user:
-        return jsonify({"error": "User already exists"}), 400
+        return jsonify({'error': 'User already exists'}), 400
     
     # hash the password before storing it
     hashed_password = generate_password_hash(password)
@@ -51,12 +51,11 @@ def register():
     new_user = {
         'username': username,
         'password': hashed_password,
+        'videos': [],
     }
-    user_ref = users_collection.add(new_user)
-    user_id = user_ref.id
+    users_collection.add(new_user)
     
-    return jsonify({"message": "User registered successfully", "user_id": user_id}), 201
-
+    return jsonify({'message': 'User registered successfully'}), 201
 
 
 # endpoint for user login
@@ -67,22 +66,44 @@ def login():
     password = data.get('password')
     
     if not username or not password:
-        return jsonify({"error": "Username and password are required"}), 400
+        return jsonify({'error': 'Username and password are required'}), 400
     
     # check if the user exists in db
     user_ref = users_collection.where('username', '==', username).get()
     
     if not user_ref:
-        return jsonify({"error": "Invalid credentials"}), 401
+        return jsonify({'error': 'Invalid credentials'}), 401
     
     user_data = user_ref[0].to_dict()
     
     # check password
     if not check_password_hash(user_data['password'], password):
-        return jsonify({"error": "Invalid credentials"}), 401
+        return jsonify({'error': 'Invalid credentials'}), 401
     
-    return jsonify({"status": "success", "user_id": user_ref[0].id}), 200
+    return jsonify({'status': 'success', 'user_id': user_ref[0].id}), 200
 
+
+
+
+# To be implemented...
+
+@app.route('/api/create_project', methods=['POST'])
+def create_project():
+    pass
+
+
+@app.route('/api/upload_ad', methods=['POST'])
+def upload_ad():
+    pass
+
+
+@app.route('/api/update_ad_data')
+def update_add_data():
+    pass
+
+
+
+# -- END ROUTES --
 
 if __name__ == '__main__':
     app.run(debug=True)
