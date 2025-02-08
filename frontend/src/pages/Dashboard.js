@@ -14,7 +14,9 @@ import {
   Divider,
   IconButton,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add"; // Importing Add icon
+import AddIcon from "@mui/icons-material/Add"; 
+import DeleteIcon from "@mui/icons-material/Delete"; // Importing Add icon
+
 import ButtonCustom from "../components/Button";
 import CloseIcon from "@mui/icons-material/Close"; // Import Close icon for modal
 
@@ -117,54 +119,89 @@ const Dashboard = () => {
       alert("Please enter an ad name and select a file.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("file", adFile);
     formData.append("user_id", userId);
     formData.append("project_id", selectedProject.project_id);
     formData.append("ad_name", adName);
-  
+
     try {
       const response = await fetch("http://localhost:5000/api/upload_ad", {
         method: "POST",
         body: formData,
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to upload ad");
       }
-  
+
       const data = await response.json();
-  
-      // Now we add the new ad to the selected project's ads directly
-      setSelectedProject((prevSelectedProject) => ({
-        ...prevSelectedProject,
+
+      // Add the new ad to the selected project's ads array
+      const updatedProject = {
+        ...selectedProject,
         ads: [
-          ...prevSelectedProject.ads,
+          ...selectedProject.ads,
           { ad_name: adName, filepath: data.file_url },
         ],
+      };
+
+      // Update the projects state by modifying the selected project with the new ad
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.project_id === selectedProject.project_id
+            ? updatedProject
+            : project
+        )
+      );
+
+      // Close the modal and reset the input fields
+      setOpenUploadAdModal(false);
+      setAdName("");
+      setAdFile(null);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleDeleteAd = async (adId) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/delete_ad", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          project_id: selectedProject.project_id,
+          ad_id: adId, // Pass the ad_id to be deleted
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete ad");
+      }
+  
+      // Remove the ad from the selected project ads list in the state
+      setSelectedProject((prevProject) => ({
+        ...prevProject,
+        ads: prevProject.ads.filter((ad) => ad.ad_id !== adId),
       }));
   
-      // Add the new ad to the selected project in the main projects list as well
+      // Optionally, you can remove the ad from the main projects list as well
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
           project.project_id === selectedProject.project_id
             ? {
                 ...project,
-                ads: [
-                  ...project.ads,
-                  { ad_name: adName, filepath: data.file_url },
-                ], // Append the new ad
+                ads: project.ads.filter((ad) => ad.ad_id !== adId),
               }
             : project
         )
       );
-  
-      // Close the modal and reset the fields
-      setOpenUploadAdModal(false);
-      setAdName("");
-      setAdFile(null);
     } catch (error) {
       alert(error.message);
     }
@@ -321,116 +358,135 @@ const Dashboard = () => {
       </Modal>
 
       {/* Project Details Modal */}
-      <Modal
-        open={openProjectModal}
-        onClose={() => setOpenProjectModal(false)} // This will still allow closing by clicking outside
-        aria-labelledby="project-details-modal"
-        aria-describedby="project-details-modal-description"
+{/* Project Details Modal */}
+<Modal
+  open={openProjectModal}
+  onClose={() => setOpenProjectModal(false)} // This will still allow closing by clicking outside
+  aria-labelledby="project-details-modal"
+  aria-describedby="project-details-modal-description"
+>
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "100vh", // Ensure it takes full height to enable background clicks
+      backdropFilter: "blur(4px)", // Keeps the blur effect for background
+    }}
+  >
+    <Card
+      sx={{
+        p: 3,
+        backgroundColor: "#fff",
+        borderRadius: 3,
+        maxWidth: 600,
+        width: "100%",
+        boxShadow: 24,
+        position: "relative", // To position the close button
+      }}
+    >
+      {/* Close Button in the top-right corner */}
+      <IconButton
+        onClick={() => setOpenProjectModal(false)} // Close the modal when clicked
+        sx={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          color: "text.secondary",
+        }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh", // Ensure it takes full height to enable background clicks
-            backdropFilter: "blur(4px)", // Keeps the blur effect for background
-          }}
-        >
-          <Card
-            sx={{
-              p: 3,
-              backgroundColor: "#fff",
-              borderRadius: 3,
-              maxWidth: 600,
-              width: "100%",
-              boxShadow: 24,
-              position: "relative", // To position the close button
-            }}
-          >
-            {/* Close Button in the top-right corner */}
-            <IconButton
-              onClick={() => setOpenProjectModal(false)} // Close the modal when clicked
+        <CloseIcon />
+      </IconButton>
+
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: 600, color: "primary.main" }}
+        gutterBottom
+      >
+        {selectedProject?.project_name}
+      </Typography>
+
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+          Ads
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+
+        {/* Display Ads and Analytics */}
+        {selectedProject?.ads?.length > 0 ? (
+          selectedProject.ads.map((ad, index) => (
+            <Card
+              key={index}
               sx={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                color: "text.secondary",
+                p: 2,
+                mb: 2,
+                backgroundColor: "background.default",
+                borderRadius: 2,
+                boxShadow: 2,
+                display: "flex", // Ensure it aligns content horizontally
+                justifyContent: "space-between", // Space between the text and the delete button
+                alignItems: "center",
               }}
             >
-              <CloseIcon />
-            </IconButton>
-
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: 600, color: "primary.main" }}
-              gutterBottom
-            >
-              {selectedProject?.project_name}
-            </Typography>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                Ads
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-
-              {/* Display Ads and Analytics */}
-              {selectedProject?.ads?.length > 0 ? (
-                selectedProject.ads.map((ad, index) => (
-                  <Card
-                    key={index}
-                    sx={{
-                      p: 2,
-                      mb: 2,
-                      backgroundColor: "background.default",
-                      borderRadius: 2,
-                      boxShadow: 2,
-                    }}
-                  >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                      {ad.ad_name}
-                    </Typography>
-                    <Box sx={{ mt: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Correct Guesses: {ad.correct_guesses || 0}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Incorrect Guesses: {ad.incorrect_guesses || 0}
-                      </Typography>
-                    </Box>
-                  </Card>
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No ads uploaded yet for this project.
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                  {ad.ad_name}
                 </Typography>
-              )}
-            </Box>
 
-            {/* Upload Ad Button */}
-            <Box
-              sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
+                {/* Correct and Incorrect Guesses */}
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Correct Guesses: {ad.correct_guesses || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Incorrect Guesses: {ad.incorrect_guesses || 0}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* Delete Icon */}
+              <IconButton
+                color="error"
+                onClick={() => handleDeleteAd(ad.ad_id)} // Pass ad_id to delete
                 sx={{
-                  padding: "10px 20px",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "primary.dark",
-                  },
+                  marginLeft: "auto", // Align the delete icon to the right
                 }}
-                onClick={() => setOpenUploadAdModal(true)}
               >
-                Upload Ad
-              </Button>
-            </Box>
-          </Card>
-        </Box>
-      </Modal>
+                <DeleteIcon />
+              </IconButton>
+            </Card>
+          ))
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No ads uploaded yet for this project.
+          </Typography>
+        )}
+      </Box>
+
+      {/* Upload Ad Button */}
+      <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{
+            padding: "10px 20px",
+            borderRadius: "8px",
+            fontWeight: 600,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              backgroundColor: "primary.dark",
+            },
+          }}
+          onClick={() => setOpenUploadAdModal(true)}
+        >
+          Upload Ad
+        </Button>
+      </Box>
+    </Card>
+  </Box>
+</Modal>
+
+
 
       {/* Upload Ad Modal */}
       <Modal
