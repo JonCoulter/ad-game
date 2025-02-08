@@ -3,6 +3,7 @@ import { Box, Typography, Button } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 // import BlitzLogo from "../assets/blitz-logo-removebg-preview.png";
 import logo from "../assets/LOGO.png";
+import { Link } from "react-router-dom";
 
 const BlitzGame = () => {
   const [score, setScore] = useState(0);
@@ -104,11 +105,15 @@ const BlitzGame = () => {
           zIndex: 2,
         }}
       >
-        <img
-          src={logo}
-          alt="Blitz Logo"
-          style={{ width: "200px", height: "auto" }}
-        />
+        <Link to="/">
+          {" "}
+          {/* Wrap the img element with Link */}
+          <img
+            src={logo}
+            alt="Blitz Logo"
+            style={{ width: "200px", height: "auto" }}
+          />
+        </Link>
       </Box>
 
       {/* Game Over Screen */}
