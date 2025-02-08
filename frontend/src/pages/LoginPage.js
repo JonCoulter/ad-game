@@ -120,11 +120,11 @@ const LoginPage = () => {
             <Button
               variant="text"
               sx={{
-                fontSize: "1.1rem",
+                fontSize: "1rem",
                 fontFamily: "'League Spartan', sans-serif",
-                color: "white",
+                color: "black",
               }}
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/register")} // ✅ Ensure this is correct
             >
               Sign up
             </Button>
