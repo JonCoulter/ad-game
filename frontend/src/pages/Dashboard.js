@@ -12,9 +12,11 @@ import {
   Container,
   Card,
   Divider,
+  IconButton,
 } from "@mui/material";
-
+import AddIcon from "@mui/icons-material/Add"; // Importing Add icon
 import ButtonCustom from "../components/Button";
+import CloseIcon from "@mui/icons-material/Close"; // Import Close icon for modal
 
 const Dashboard = () => {
   const { userId, setUserId } = useAuth();
@@ -100,8 +102,8 @@ const Dashboard = () => {
       // Refresh the project list
       const data = await response.json();
       setProjects((prevProjects) => [
+        { project_name: newProjectName, ads: [] }, // Add new project to the list
         ...prevProjects,
-        { project_name: newProjectName, ads: [] },
       ]);
       setOpenCreateProjectModal(false); // Close modal
       setNewProjectName(""); // Reset project name field
@@ -115,26 +117,36 @@ const Dashboard = () => {
       alert("Please enter an ad name and select a file.");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("file", adFile);
     formData.append("user_id", userId);
     formData.append("project_id", selectedProject.project_id);
     formData.append("ad_name", adName);
-
+  
     try {
       const response = await fetch("http://localhost:5000/api/upload_ad", {
         method: "POST",
         body: formData,
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to upload ad");
       }
-
+  
       const data = await response.json();
-      // Add new ad to the selected project
+  
+      // Now we add the new ad to the selected project's ads directly
+      setSelectedProject((prevSelectedProject) => ({
+        ...prevSelectedProject,
+        ads: [
+          ...prevSelectedProject.ads,
+          { ad_name: adName, filepath: data.file_url },
+        ],
+      }));
+  
+      // Add the new ad to the selected project in the main projects list as well
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
           project.project_id === selectedProject.project_id
@@ -143,11 +155,13 @@ const Dashboard = () => {
                 ads: [
                   ...project.ads,
                   { ad_name: adName, filepath: data.file_url },
-                ],
+                ], // Append the new ad
               }
             : project
         )
       );
+  
+      // Close the modal and reset the fields
       setOpenUploadAdModal(false);
       setAdName("");
       setAdFile(null);
@@ -169,51 +183,102 @@ const Dashboard = () => {
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Typography variant="h4" gutterBottom>
-        Welcome, {username}!
-      </Typography>
-      <Typography variant="subtitle1">Here are your projects:</Typography>
+    <Container maxWidth="lg" sx={{ mt: 5 }}>
+      <Grid container spacing={2} alignItems="center">
+        {/* Grid Item for Welcome Text */}
+        <Grid item xs={10}>
+          <Typography variant="h4" sx={{ fontSize: "2rem" }} gutterBottom>
+            Welcome, {username}!
+          </Typography>
+        </Grid>
 
-      <Box sx={{ mt: 3, mb: 2 }}>
-        <ButtonCustom
-          text="Create Project"
-          onClick={() => setOpenCreateProjectModal(true)}
-          color="primary"
-        />
-      </Box>
+        {/* Grid Item for Logout Button */}
+        <Grid item xs={2} sx={{ textAlign: "right" }}>
+          <ButtonCustom
+            text="Log Out"
+            onClick={handleLogout}
+            color="secondary"
+            variant="outlined"
+            sx={{
+              padding: "4px 10px", // Smaller padding
+              fontWeight: 600,
+              fontSize: "0.8rem", // Reduced font size
+              boxShadow: 2,
+              borderRadius: "20px",
+              "&:hover": {
+                backgroundColor: "secondary.light",
+              },
+            }}
+          />
+        </Grid>
+      </Grid>
+
+      <Typography variant="subtitle1" sx={{ mb: 3 }}>
+        Here are your projects:
+      </Typography>
 
       {/* Grid for Projects */}
-      <Grid container spacing={2}>
-        {projects.map((project) => (
-          <Grid item xs={12} sm={6} key={project.project_id}>
-            <Paper
+      <Grid container spacing={3}>
+        {/* Create Project Button styled as a project card */}
+        <Grid item xs={12} sm={6} md={4}>
+          {/* Create Project Button styled as a project card */}
+          <Card
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 2,
+              borderRadius: 2,
+              boxShadow: 2,
+              cursor: "pointer", // Make it a pointer on hover
+              height: "100%", // Full height
+              backgroundColor: "primary.main",
+              color: "white",
+              transition: "transform 0.3s",
+              "&:hover": {
+                transform: "translateY(-5px)",
+                boxShadow: 6,
+              },
+            }}
+            onClick={() => setOpenCreateProjectModal(true)}
+          >
+            <AddIcon sx={{ fontSize: 40 }} />
+            <Typography variant="body1">Create Project</Typography>
+          </Card>
+        </Grid>
+
+        {projects.map((project, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Card
               sx={{
-                padding: 2,
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
+                alignItems: "center", // Center horizontally
+                justifyContent: "center", // Center vertically
+                padding: 2,
+                borderRadius: 2,
+                boxShadow: 2,
+                cursor: "pointer", // Make it a pointer on hover
+                height: "100%", // Full height
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: 6,
+                },
+              }}
+              onClick={() => {
+                setSelectedProject(project);
+                setOpenProjectModal(true);
               }}
             >
-              <Typography variant="h6">{project.project_name}</Typography>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => {
-                  setSelectedProject(project);
-                  setOpenProjectModal(true);
-                }}
-              >
-                View Details
-              </Button>
-            </Paper>
+              <Typography variant="h6" align="center">
+                {project.project_name}
+              </Typography>
+            </Card>
           </Grid>
         ))}
       </Grid>
-
-      <Box sx={{ mt: 3 }}>
-        <ButtonCustom text="Log Out" onClick={handleLogout} color="secondary" />
-      </Box>
 
       {/* Create Project Modal */}
       <Modal
@@ -230,6 +295,7 @@ const Dashboard = () => {
             maxWidth: 400,
             margin: "auto",
             mt: 5,
+            boxShadow: 6,
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -241,37 +307,33 @@ const Dashboard = () => {
             fullWidth
             value={newProjectName}
             onChange={(e) => setNewProjectName(e.target.value)}
+            sx={{ mb: 2 }}
           />
-          <Box sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCreateProject}
-            >
-              Create Project
-            </Button>
-          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={handleCreateProject}
+          >
+            Create Project
+          </Button>
         </Box>
       </Modal>
 
+      {/* Project Details Modal */}
       <Modal
         open={openProjectModal}
-        onClose={() => setOpenProjectModal(false)} // Handles closing the modal when clicking outside
+        onClose={() => setOpenProjectModal(false)} // This will still allow closing by clicking outside
         aria-labelledby="project-details-modal"
         aria-describedby="project-details-modal-description"
-        BackdropProps={{
-          style: {
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Adjusts the backdrop opacity
-          },
-        }}
       >
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            minHeight: "100vh",
-            backdropFilter: "blur(4px)",
+            minHeight: "100vh", // Ensure it takes full height to enable background clicks
+            backdropFilter: "blur(4px)", // Keeps the blur effect for background
           }}
         >
           <Card
@@ -282,8 +344,22 @@ const Dashboard = () => {
               maxWidth: 600,
               width: "100%",
               boxShadow: 24,
+              position: "relative", // To position the close button
             }}
           >
+            {/* Close Button in the top-right corner */}
+            <IconButton
+              onClick={() => setOpenProjectModal(false)} // Close the modal when clicked
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                color: "text.secondary",
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+
             <Typography
               variant="h4"
               sx={{ fontWeight: 600, color: "primary.main" }}
@@ -365,39 +441,81 @@ const Dashboard = () => {
       >
         <Box
           sx={{
-            p: 4,
-            backgroundColor: "white",
-            borderRadius: 2,
-            maxWidth: 400,
-            margin: "auto",
-            mt: 5,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh", // Ensure it takes full height to enable background clicks
+            backdropFilter: "blur(4px)", // Keeps the blur effect for background
           }}
         >
-          <Typography variant="h6" gutterBottom>
-            Upload an Ad
-          </Typography>
-          <TextField
-            label="Ad Name"
-            variant="outlined"
-            fullWidth
-            value={adName}
-            onChange={(e) => setAdName(e.target.value)}
-          />
-          <input
-            type="file"
-            onChange={(e) => setAdFile(e.target.files[0])}
-            accept="video/mp4"
-            style={{ marginTop: 8 }}
-          />
-          <Box sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleUploadAd}
+          <Card
+            sx={{
+              p: 3,
+              backgroundColor: "#fff",
+              borderRadius: 3,
+              maxWidth: 600,
+              width: "100%",
+              boxShadow: 24,
+              position: "relative", // To position the close button if necessary
+            }}
+          >
+            {/* Close Button in the top-right corner */}
+            <IconButton
+              onClick={() => setOpenUploadAdModal(false)} // Close the modal when clicked
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                color: "text.secondary",
+              }}
             >
-              Upload Ad
-            </Button>
-          </Box>
+              <CloseIcon />
+            </IconButton>
+
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 600, color: "primary.main" }}
+              gutterBottom
+            >
+              Upload an Ad
+            </Typography>
+
+            <TextField
+              label="Ad Name"
+              variant="outlined"
+              fullWidth
+              value={adName}
+              onChange={(e) => setAdName(e.target.value)}
+              sx={{ mb: 3 }} // Add some margin for spacing
+            />
+
+            <input
+              type="file"
+              onChange={(e) => setAdFile(e.target.files[0])}
+              accept="video/mp4"
+              style={{ marginTop: 8, width: "100%" }} // Make sure it stretches across the modal width
+            />
+
+            <Box sx={{ mt: 3 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleUploadAd}
+                sx={{
+                  padding: "10px 20px",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                  },
+                }}
+              >
+                Upload Ad
+              </Button>
+            </Box>
+          </Card>
         </Box>
       </Modal>
     </Container>
