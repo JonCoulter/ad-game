@@ -1,0 +1,6 @@
+@font-face {
+  font-family: "LogoFont"; /* Custom name */
+  src: url("./fonts/logoFONT.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}

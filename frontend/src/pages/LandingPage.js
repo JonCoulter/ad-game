@@ -2,11 +2,23 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Container } from "@mui/material";
-import logo from "../assets/MainLogo.png"; // ✅ Correct import path
+import logo from "../assets/LOGO.png"; 
+import "../assets/fonts.css";
 
 const LandingPage = () => {
   const navigate = useNavigate();
   return (
+<Box 
+      sx={{
+        backgroundColor: "#75b3d0", // ✅ Set background color
+         width: "100vw",  // ✅ Ensures full width
+        height: "100vh", // ✅ Ensures full height
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
     <Container maxWidth="sm" sx={{ textAlign: "center", mt: 8 }}>
       {}
       <Box
@@ -14,17 +26,19 @@ const LandingPage = () => {
   src= {logo}
   alt="AdVera Logo"
   sx={{
-    width: "100px",  // Adjust size as needed
-    height: "100px",
+    width: "200px",  // Adjust size as needed
+    height: "150px",
     mx: "auto",
     mb: 2,
   }}
 />
 
-      {/* Title */}
-      <Typography variant="h3" fontWeight="bold">
-        AdVera
-      </Typography>
+<Typography 
+  variant="h3" 
+  sx={{ fontFamily: "LogoFont, sans-serif", fontSize: "3rem" }}
+>
+  adVera
+</Typography>
 
       {/* Subtitle */}
       <Typography 
@@ -69,6 +83,7 @@ const LandingPage = () => {
         <br />
       </Typography>
     </Container>
+    </Box>
   );
 };
 
