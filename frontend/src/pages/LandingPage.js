@@ -1,77 +1,49 @@
 // src/pages/LandingPage.js
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Container } from "@mui/material";
-import logo from "../assets/LOGO.png"; 
-import "../assets/fonts.css";
 
 const LandingPage = () => {
-  const navigate = useNavigate();
   return (
-<Box 
-      sx={{
-        backgroundColor: "#75b3d0", // ✅ Set background color
-         width: "100vw",  // ✅ Ensures full width
-        height: "100vh", // ✅ Ensures full height
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
     <Container maxWidth="sm" sx={{ textAlign: "center", mt: 8 }}>
-      {}
+      {/* Logo (Placeholder for now, replace with an actual image if needed) */}
       <Box
-  component="img"
-  src= {logo}
-  alt="AdVera Logo"
-  sx={{
-    width: "200px",  // Adjust size as needed
-    height: "150px",
-    mx: "auto",
-    mb: 2,
-  }}
-/>
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "80px",
+          height: "80px",
+          backgroundColor: "#d3d6da", // Placeholder background color
+          borderRadius: "8px",
+          mx: "auto",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+          🔲
+        </Typography>
+      </Box>
 
-<Typography 
-  variant="h3" 
-  sx={{ fontFamily: "LogoFont, sans-serif", fontSize: "3rem" }}
->
-  adVera
-</Typography>
+      {/* Title */}
+      <Typography variant="h3" fontWeight="bold">
+        Ad Detector
+      </Typography>
 
       {/* Subtitle */}
-      <Typography 
-  variant="subtitle1" 
-  sx={{ 
-    mt: 1, 
-    mb: 4, 
-    fontSize: "1.2rem", // Change font size
-    fontWeight: "bold", // Change font weight
-    fontFamily: "'League Spartan', sans-serif", // Use a custom font
-    color: "#333" 
-  }}
->
-  Not everything is what it seems... can you spot the ads?
-</Typography>
+      <Typography variant="subtitle1" sx={{ mt: 1, mb: 4 }}>
+        Get 6 chances to detect if a video is an ad or not.
+      </Typography>
 
       {/* Buttons */}
       <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-        <Button
-          variant="outlined"
-          sx={{ borderRadius: "24px", px: 4 }}
-          onClick={() => navigate("/login")} // ✅ Correct navigation
-        >
+        <Button variant="outlined" sx={{ borderRadius: "24px", px: 4 }}>
           Log in
         </Button>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "24px", px: 4 }}
-          onClick={() => navigate("/BlitzGame")}
-        >
+        <Button variant="contained" sx={{ borderRadius: "24px", px: 4 }}>
           Blitz
         </Button>
       </Box>
+
       {/* Footer */}
       <Typography
         variant="caption"
@@ -83,7 +55,6 @@ const LandingPage = () => {
         <br />
       </Typography>
     </Container>
-    </Box>
   );
 };
 
