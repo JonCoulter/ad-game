@@ -96,7 +96,7 @@ const BlitzGame = () => {
             color: "#007FFF",
           }}
         >
-          Time Left: {String(Math.floor(timer / 60)).padStart(2, "0")}:
+          {String(Math.floor(timer / 60)).padStart(2, "0")}:
           {String(timer % 60).padStart(2, "0")}
         </Typography>
 
@@ -110,7 +110,7 @@ const BlitzGame = () => {
             color: "#FF5722",
           }}
         >
-          Score: {score}
+          {score}
         </Typography>
       </Box>
 
@@ -124,11 +124,52 @@ const BlitzGame = () => {
             sx={{ mt: 2 }}
             onClick={() => navigate("/")}
           >
-            Back to Home
+            Home
           </Button>
         </>
       ) : (
-        <Box sx={{ position: "relative", width: "100%", height: "500px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            position: "relative", // Needed for absolute positioning
+          }}
+        >
+          {/* Left Label (Ad) */}
+          <Typography
+            variant="h5"
+            sx={{
+              position: "absolute",
+              left: "-12%", // Moves it closer to the edge
+              top: "50%", // Centers vertically
+
+              color: "red",
+              opacity: 0.6,
+              fontWeight: "bold",
+            }}
+          >
+            ⬅️ AD
+          </Typography>
+
+          {/* Right Label (Real Video) */}
+          <Typography
+            variant="h5"
+            sx={{
+              position: "absolute",
+              right: "-20%", // Moves it closer to the edge
+              top: "50%", // Centers vertically
+
+              color: "green",
+              opacity: 0.6,
+              fontWeight: "bold",
+            }}
+          >
+            REAL ➡️
+          </Typography>
+
+          {/* Video */}
           <AnimatePresence>
             <motion.div
               key={currentIndex}
@@ -145,7 +186,8 @@ const BlitzGame = () => {
               transition={{ duration: 0.3 }}
               style={{
                 width: "100%",
-                aspectRatio: "9 / 16", // ✅ Forces 9:16 portrait mode
+                maxWidth: "360px",
+                aspectRatio: "9 / 16",
                 borderRadius: "12px",
                 overflow: "hidden",
                 position: "relative",
@@ -158,7 +200,7 @@ const BlitzGame = () => {
                 style={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover", // ✅ Ensures the video fills the frame
+                  objectFit: "cover",
                   borderRadius: "12px",
                 }}
               />
