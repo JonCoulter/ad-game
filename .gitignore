@@ -1,4 +1,6 @@
-/videos
+/video_scraper/videos
+/video_scraper/ads
+/video_scraper/.env
 
 /frontend/node_modules
 
