@@ -374,7 +374,6 @@ const Dashboard = () => {
       </Modal>
 
       {/* Project Details Modal */}
-      {/* Project Details Modal */}
       <Modal
         open={openProjectModal}
         onClose={() => setOpenProjectModal(false)} // This will still allow closing by clicking outside

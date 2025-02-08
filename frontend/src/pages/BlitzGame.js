@@ -6,7 +6,7 @@ import logo from "../assets/LOGO.png";
 
 const BlitzGame = () => {
   const [score, setScore] = useState(0);
-  const [timer, setTimer] = useState(5);
+  const [timer, setTimer] = useState(60);
   const [isGameOver, setIsGameOver] = useState(false);
   const [currentVideo, setCurrentVideo] = useState(null);
   const [swipeDirection, setSwipeDirection] = useState(null);
