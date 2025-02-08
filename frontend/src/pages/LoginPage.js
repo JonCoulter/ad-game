@@ -9,6 +9,7 @@ import {
   Container,
   TextField,
   Button,
+  Box,
 } from "@mui/material";
 
 const LoginPage = () => {
@@ -86,6 +87,18 @@ const LoginPage = () => {
           >
             Log in
           </Button>
+
+          {/* Sign Up Button */}
+          <Box sx={{ textAlign: "center", mt: 2 }}>
+            <Typography variant="body2">Don't have an account?</Typography>
+            <Button
+              variant="text"
+              color="secondary"
+              onClick={() => navigate("/register")} // Redirect to Register Page
+            >
+              Sign up
+            </Button>
+          </Box>
         </CardContent>
       </Card>
     </Container>

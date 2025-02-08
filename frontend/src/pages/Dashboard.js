@@ -24,7 +24,6 @@ const Dashboard = () => {
     setUserId(null);
     navigate("/");
   };
-
   const projects = [
     { name: "Project A", status: "Running" },
     { name: "Project B", status: "Completed" },
